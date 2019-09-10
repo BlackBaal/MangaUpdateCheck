@@ -135,12 +135,9 @@ func main() {
 		log.Fatal(err)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
-
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
 	go http.ListenAndServe(":" + port, nil)
+	for update := range updates {
+		log.Printf("%+v\n", update)
+	}
+
 }
