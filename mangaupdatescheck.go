@@ -10,7 +10,6 @@ import (
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
-	fmt.Println(id)
 	query := fmt.Sprintf("UPDATE database SET VALUE = %d WHERE ID = %d", count, id)
 	_, err := db.Exec(query)
 	if err != nil {
@@ -64,8 +63,8 @@ func botCore(link string, dif int) {
 func main() {
 	var (
 		id    int
-		title string //Full name of the manga
-		link  string //Link to manga
+		title string //Full name
+		link  string //Link to page for scraping
 		value int    //Number of chapters currently saved in database
 		count = 0    //Number of found chapters
 	)
@@ -97,16 +96,13 @@ func main() {
 		}
 		log.Println(id, title, link, value)
 		c.Visit(link)
-		if count > value {
-			// Send notification that new chapters are available
+		if count == value {
+			// Send notification when new chapters are available
 			botCore(link, count-value)
-			//Change chapter count inside th db
+			//Change chapter count inside the db
 			changeCount(id, count, db)
 		}
 		count = 0
 	}
-	//port := os.Getenv("PORT")
-	//if port == "" {
-	//	log.Fatal("$PORT must be set")
-	//}
+
 }
