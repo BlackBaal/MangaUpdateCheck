@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/gocolly/colly"
 
-	//"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
-	"net/http"
 	"os"
 )
 
@@ -34,7 +33,7 @@ func dbConnect() (info string) {
 	return dbInfo
 }
 
-func botCore(name string, link string, dif int) {
+func botCore(link string, dif int) {
 
 	//dialer, proxyErr := proxy.SOCKS5(
 	//	"tcp",
@@ -67,97 +66,82 @@ func botCore(name string, link string, dif int) {
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
-	//msg := tgbotapi.NewMessage(37434600, "")
-	//if dif > 1 {
-	//	msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
-	//} else {
-	//	msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter")
-	//}
-	//bot.Send(msg)
+	msg := tgbotapi.NewMessage(37434600, "")
+	if dif > 1 {
+		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
+	} else {
+		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter")
+	}
+	bot.Send(msg)
 }
 //func hello(w http.ResponseWriter, r *http.Request) {
 //	fmt.Fprintln(w, "Hello World")
 //}
 
 func main() {
-	//var (
-	//	id    int
-	//	title string //Full name of the manga
-	//	link  string //Link to manga
-	//	value int    //Number of chapters currently saved in database
-	//	count = 0    //Number of found chapters
-	//)
+	var (
+		id    int
+		title string //Full name of the manga
+		link  string //Link to manga
+		value int    //Number of chapters currently saved in database
+		count = 0    //Number of found chapters
+	)
 
 	//Open database
-	//db, err := sql.Open("postgres", dbConnect())
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer db.Close()
-	//
-	//// Instantiate default collector
-	//c := colly.NewCollector(
-	//	colly.AllowedDomains("mangarock.com", "www.magarock.com"),
-	//)
-	//
-	//// On every a element which has class attribute call callback
-	//c.OnHTML("a[class]", func(e *colly.HTMLElement) {
-	//	if e.Attr("class") == "_1A2Dc rZ05K" {
-	//		count += 1
-	//	}
-	//})
-	//
-	//res, _ := db.Query("select * from database")
-	//for res.Next() {
-	//	err := res.Scan(&id, &title, &link, &value)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	log.Println(id, title, link, value)
-	//	c.Visit(link)
-	//	if count > value {
-	//		// Send notification that new chapters are available
-	//		botCore(title, link, count-value)
-	//		//Change chapter count inside th db
-	//		changeCount(id, count, db)
-	//	}
-	//	count = 0
-	//}
+	db, err := sql.Open("postgres", dbConnect())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Instantiate default collector
+	c := colly.NewCollector(
+		colly.AllowedDomains("mangarock.com", "www.magarock.com"),
+	)
+
+	// On every a element which has class attribute call callback
+	c.OnHTML("a[class]", func(e *colly.HTMLElement) {
+		if e.Attr("class") == "_1A2Dc rZ05K" {
+			count += 1
+		}
+	})
+
+	res, _ := db.Query("select * from database")
+	for res.Next() {
+		err := res.Scan(&id, &title, &link, &value)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(id, title, link, value)
+		c.Visit(link)
+		if count == value {
+			// Send notification that new chapters are available
+			botCore(link, count-value)
+			//Change chapter count inside th db
+			changeCount(id, count, db)
+		}
+		count = 0
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	//dialer, proxyErr := proxy.SOCKS5(
-	//	"tcp",
-	//	"62.112.11.204:80",
-	//	nil,
-	//	proxy.Direct,
-	//)
-	//if proxyErr != nil {
-	//	log.Panicf("Error in proxy %s", proxyErr)
+	//bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
+	//if err != nil {
+	//	log.Panic(err)
 	//}
-
-	//client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-	//	return dialer.Dial(network, addr)
-	//}}}
-	//bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
-	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
-	if err != nil {
-		log.Panic(err)
-	}
-	bot.Debug = true
-	log.Printf("Logged on %s", bot.Self.UserName)
-	baseURL := "https://mangaupdatescheck.herokuapp.com/"
-	url := baseURL + bot.Token
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
-	if err != nil {
-		log.Fatal(err)
-	}
-	updates := bot.ListenForWebhook("/" + bot.Token)
-	//http.HandleFunc("/", hello)
-	http.ListenAndServe(":"+port, nil)
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
+	//bot.Debug = true
+	//log.Printf("Logged on %s", bot.Self.UserName)
+	//baseURL := "https://mangaupdatescheck.herokuapp.com/"
+	//url := baseURL + bot.Token
+	//_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//updates := bot.ListenForWebhook("/" + bot.Token)
+	//http.ListenAndServe(":"+port, nil)
+	//for update := range updates {
+	//	log.Printf("%+v\n", update)
+	//}
 
 }
