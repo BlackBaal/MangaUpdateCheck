@@ -1,15 +1,10 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/gocolly/colly"
-	"golang.org/x/net/proxy"
-	"net"
-	"net/http"
-
 	_ "github.com/lib/pq"
 	"log"
 )
