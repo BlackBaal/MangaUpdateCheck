@@ -55,17 +55,17 @@ func botCore(link string, dif int) {
 	}
 	bot.Debug = true
 	log.Printf("Logged on %s", bot.Self.UserName)
-	baseURL := "https://mangaupdatescheck.herokuapp.com/"
-	url := baseURL + bot.Token
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
-	if err != nil {
-		log.Fatal(err)
-	}
-	updates := bot.ListenForWebhook("/" + bot.Token)
-
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
+	//baseURL := "https://mangaupdatescheck.herokuapp.com/"
+	//url := baseURL + bot.Token
+	//_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//updates := bot.ListenForWebhook("/" + bot.Token)
+	//
+	//for update := range updates {
+	//	log.Printf("%+v\n", update)
+	//}
 	msg := tgbotapi.NewMessage(37434600, "")
 	if dif > 1 {
 		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
