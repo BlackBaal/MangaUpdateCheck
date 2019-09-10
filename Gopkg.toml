@@ -47,5 +47,5 @@
 
 [metadata.heroku]
 root-package = "backend"
-build = ["."]
+build = ["./bin"]
 ensure = "false"
