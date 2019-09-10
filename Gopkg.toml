@@ -45,4 +45,7 @@
   go-tests = true
   unused-packages = true
 
-metadata.heroku['root-package'] = "MangaUpdatesCheck"
+[metadata.heroku]
+root-package = "backend"
+build = ["."]
+ensure = "false"
