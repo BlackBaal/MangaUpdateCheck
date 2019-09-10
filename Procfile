@@ -1,1 +1,1 @@
-web: MangaCheck
+web: mangaupdatescheck
