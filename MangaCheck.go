@@ -120,6 +120,10 @@ func main() {
 	//	}
 	//	count = 0
 	//}
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
 	if err != nil {
 		log.Panic(err)
@@ -133,7 +137,7 @@ func main() {
 		log.Fatal(err)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServe(":" + os.Getenv("PORT"), nil)
+	go http.ListenAndServe(":"+port, nil)
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
