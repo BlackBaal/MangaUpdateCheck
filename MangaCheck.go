@@ -85,8 +85,6 @@ func main() {
 	//	count = 0    //Number of found chapters
 	//)
 
-	port := os.Getenv("PORT")
-
 	//Open database
 	//db, err := sql.Open("postgres", dbConnect())
 	//if err != nil {
@@ -135,7 +133,7 @@ func main() {
 		log.Fatal(err)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServe(":" + port, nil)
+	go http.ListenAndServe(":" + os.Getenv("PORT"), nil)
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
