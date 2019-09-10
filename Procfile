@@ -1,1 +1,1 @@
-web: mangaupdatescheck
+web: bin/mangaupdatescheck
