@@ -4,11 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"golang.org/x/net/proxy"
+	"net"
+
 	//"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
+	"context"
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
@@ -124,7 +128,21 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
+	dialer, proxyErr := proxy.SOCKS5(
+		"tcp",
+		"62.112.11.204:80",
+		nil,
+		proxy.Direct,
+	)
+	if proxyErr != nil {
+		log.Panicf("Error in proxy %s", proxyErr)
+	}
+
+	client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+		return dialer.Dial(network, addr)
+	}}}
+	bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
+	//bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
 	if err != nil {
 		log.Panic(err)
 	}
