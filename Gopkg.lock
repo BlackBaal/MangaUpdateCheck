@@ -194,7 +194,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/go-telegram-bot-api/telegram-bot-api",
-    "github.com/gocolly/colly",
     "github.com/lib/pq",
     "golang.org/x/net/proxy",
   ]

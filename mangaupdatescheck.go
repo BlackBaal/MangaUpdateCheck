@@ -96,7 +96,7 @@ func main() {
 		}
 		log.Println(id, title, link, value)
 		c.Visit(link)
-		if count == value {
+		if count > value {
 			// Send notification when new chapters are available
 			botCore(link, count-value)
 			//Change chapter count inside the db
