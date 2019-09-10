@@ -58,9 +58,9 @@ func botCore(name string, link string, dif int) {
 	log.Printf("Logged on %s", bot.Self.UserName)
 	msg := tgbotapi.NewMessage(37434600, "")
 	if dif > 1 {
-		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters\n")
+		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
 	} else {
-		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter\n")
+		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter")
 	}
 	bot.Send(msg)
 }
