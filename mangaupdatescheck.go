@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"golang.org/x/net/proxy"
-	"net"
 
 	//"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
