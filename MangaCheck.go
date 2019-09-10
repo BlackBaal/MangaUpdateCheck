@@ -7,6 +7,8 @@ import (
 	"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
+	"net/http"
+	"os"
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
@@ -53,14 +55,26 @@ func botCore(name string, link string, dif int) {
 	}
 	bot.Debug = true
 	log.Printf("Logged on %s", bot.Self.UserName)
-	msg := tgbotapi.NewMessage(37434600, "")
-	if dif > 1 {
-		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
-	} else {
-		msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter")
+	baseURL := "https://mangaupdatescheck.herokuapp.com/"
+	url := baseURL + bot.Token
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
+	if err != nil {
+		log.Fatal(err)
 	}
-	bot.Send(msg)
+	updates := bot.ListenForWebhook("/" + bot.Token)
+
+	for update := range updates {
+		log.Printf("%+v\n", update)
+	}
+	//msg := tgbotapi.NewMessage(37434600, "")
+	//if dif > 1 {
+	//	msg.Text = fmt.Sprintln(link, "\n", dif, "new chapters")
+	//} else {
+	//	msg.Text = fmt.Sprintln(link, "\n", dif, "new chapter")
+	//}
+	//bot.Send(msg)
 }
+
 
 func main() {
 	var (
@@ -70,6 +84,8 @@ func main() {
 		value int    //Number of chapters currently saved in database
 		count = 0    //Number of found chapters
 	)
+
+	port := os.Getenv("PORT")
 
 	//Open database
 	db, err := sql.Open("postgres", dbConnect())
@@ -106,4 +122,5 @@ func main() {
 		}
 		count = 0
 	}
+	go http.ListenAndServe(":" + port, nil)
 }
