@@ -88,39 +88,59 @@ func main() {
 	port := os.Getenv("PORT")
 
 	//Open database
-	db, err := sql.Open("postgres", dbConnect())
+	//db, err := sql.Open("postgres", dbConnect())
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//defer db.Close()
+	//
+	//// Instantiate default collector
+	//c := colly.NewCollector(
+	//	colly.AllowedDomains("mangarock.com", "www.magarock.com"),
+	//)
+	//
+	//// On every a element which has class attribute call callback
+	//c.OnHTML("a[class]", func(e *colly.HTMLElement) {
+	//	if e.Attr("class") == "_1A2Dc rZ05K" {
+	//		count += 1
+	//	}
+	//})
+	//
+	//res, _ := db.Query("select * from database")
+	//for res.Next() {
+	//	err := res.Scan(&id, &title, &link, &value)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	log.Println(id, title, link, value)
+	//	c.Visit(link)
+	//	if count > value {
+	//		// Send notification that new chapters are available
+	//		botCore(title, link, count-value)
+	//		//Change chapter count inside th db
+	//		changeCount(id, count, db)
+	//	}
+	//	count = 0
+	//}
+	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
+	if err != nil {
+		log.Panic(err)
+	}
+	bot.Debug = true
+	log.Printf("Logged on %s", bot.Self.UserName)
+	baseURL := "https://mangaupdatescheck.herokuapp.com/"
+	url := baseURL + bot.Token
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	updates := bot.ListenForWebhook("/" + bot.Token)
 
-	// Instantiate default collector
-	c := colly.NewCollector(
-		colly.AllowedDomains("mangarock.com", "www.magarock.com"),
-	)
-
-	// On every a element which has class attribute call callback
-	c.OnHTML("a[class]", func(e *colly.HTMLElement) {
-		if e.Attr("class") == "_1A2Dc rZ05K" {
-			count += 1
-		}
-	})
-
-	res, _ := db.Query("select * from database")
-	for res.Next() {
-		err := res.Scan(&id, &title, &link, &value)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(id, title, link, value)
-		c.Visit(link)
-		if count > value {
-			// Send notification that new chapters are available
-			botCore(title, link, count-value)
-			//Change chapter count inside th db
-			changeCount(id, count, db)
-		}
-		count = 0
+	for update := range updates {
+		log.Printf("%+v\n", update)
+	}
+	for update := range updates {
+		log.Printf("%+v\n", update)
 	}
 	go http.ListenAndServe(":" + port, nil)
 }
