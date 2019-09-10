@@ -4,15 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"golang.org/x/net/proxy"
-	"net"
-
 	//"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
-	"context"
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
@@ -78,7 +74,9 @@ func botCore(name string, link string, dif int) {
 	//}
 	//bot.Send(msg)
 }
-
+func hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Hello World")
+}
 
 func main() {
 	//var (
@@ -128,36 +126,37 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	dialer, proxyErr := proxy.SOCKS5(
-		"tcp",
-		"62.112.11.204:80",
-		nil,
-		proxy.Direct,
-	)
-	if proxyErr != nil {
-		log.Panicf("Error in proxy %s", proxyErr)
-	}
-
-	client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return dialer.Dial(network, addr)
-	}}}
-	bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
-	//bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
-	if err != nil {
-		log.Panic(err)
-	}
-	bot.Debug = true
-	log.Printf("Logged on %s", bot.Self.UserName)
-	baseURL := "https://mangaupdatescheck.herokuapp.com/"
-	url := baseURL + bot.Token
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
-	if err != nil {
-		log.Fatal(err)
-	}
-	updates := bot.ListenForWebhook("/" + bot.Token)
+	//dialer, proxyErr := proxy.SOCKS5(
+	//	"tcp",
+	//	"62.112.11.204:80",
+	//	nil,
+	//	proxy.Direct,
+	//)
+	//if proxyErr != nil {
+	//	log.Panicf("Error in proxy %s", proxyErr)
+	//}
+	//
+	//client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+	//	return dialer.Dial(network, addr)
+	//}}}
+	//bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
+	////bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
+	//if err != nil {
+	//	log.Panic(err)
+	//}
+	//bot.Debug = true
+	//log.Printf("Logged on %s", bot.Self.UserName)
+	//baseURL := "https://mangaupdatescheck.herokuapp.com/"
+	//url := baseURL + bot.Token
+	//_, err = bot.SetWebhook(tgbotapi.NewWebhook(url))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//updates := bot.ListenForWebhook("/" + bot.Token)
+	http.HandleFunc("/", hello)
 	go http.ListenAndServe(":"+port, nil)
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
+	//for update := range updates {
+	//	log.Printf("%+v\n", update)
+	//}
 
 }
