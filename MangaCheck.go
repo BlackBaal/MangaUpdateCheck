@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/gocolly/colly"
+	//"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
@@ -77,13 +77,13 @@ func botCore(name string, link string, dif int) {
 
 
 func main() {
-	var (
-		id    int
-		title string //Full name of the manga
-		link  string //Link to manga
-		value int    //Number of chapters currently saved in database
-		count = 0    //Number of found chapters
-	)
+	//var (
+	//	id    int
+	//	title string //Full name of the manga
+	//	link  string //Link to manga
+	//	value int    //Number of chapters currently saved in database
+	//	count = 0    //Number of found chapters
+	//)
 
 	port := os.Getenv("PORT")
 
