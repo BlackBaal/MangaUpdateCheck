@@ -1,16 +1,12 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
-	"golang.org/x/net/proxy"
 	"log"
-	"net"
-	"net/http"
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
@@ -37,20 +33,21 @@ func dbConnect() (info string) {
 
 func botCore(name string, link string, dif int) {
 
-	dialer, proxyErr := proxy.SOCKS5(
-		"tcp",
-		"62.112.11.204:80",
-		nil,
-		proxy.Direct,
-	)
-	if proxyErr != nil {
-		log.Panicf("Error in proxy %s", proxyErr)
-	}
+	//dialer, proxyErr := proxy.SOCKS5(
+	//	"tcp",
+	//	"62.112.11.204:80",
+	//	nil,
+	//	proxy.Direct,
+	//)
+	//if proxyErr != nil {
+	//	log.Panicf("Error in proxy %s", proxyErr)
+	//}
 
-	client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return dialer.Dial(network, addr)
-	}}}
-	bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
+	//client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+	//	return dialer.Dial(network, addr)
+	//}}}
+	//bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
+	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
 	if err != nil {
 		log.Panic(err)
 	}
