@@ -154,7 +154,7 @@ func main() {
 	//}
 	//updates := bot.ListenForWebhook("/" + bot.Token)
 	http.HandleFunc("/", hello)
-	go http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":"+port, nil)
 	//for update := range updates {
 	//	log.Printf("%+v\n", update)
 	//}
