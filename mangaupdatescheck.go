@@ -7,6 +7,7 @@ import (
 	"github.com/gocolly/colly"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 )
 
 func changeCount(id int, count int, db *sql.DB) error {
@@ -16,17 +17,6 @@ func changeCount(id int, count int, db *sql.DB) error {
 		return err
 	}
 	return nil
-}
-
-func dbConnect() (info string) {
-	var host = "ec2-54-75-245-196.eu-west-1.compute.amazonaws.com"
-	var port = "5432"
-	var user = "paxfbkluuhzzxd"
-	var password = "e3dd8f47e1e2bc1b0c266248f5a449ebcc8f19dcca546091fe25087b386321d7"
-	var dbname = "d6knbc375gophn"
-	var sslmode = ""
-	var dbInfo = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", host, port, user, password, dbname, sslmode)
-	return dbInfo
 }
 
 func botCore(link string, dif int) {
@@ -70,7 +60,7 @@ func main() {
 	)
 
 	//Open database
-	db, err := sql.Open("postgres", dbConnect())
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
