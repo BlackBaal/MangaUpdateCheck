@@ -10,6 +10,12 @@ import (
 	"os"
 )
 
+type Data struct {
+	id    int
+	title string //Full name
+	link  string //Link to page for scraping
+	value int    //Number of chapters currently saved in database
+}
 func changeCount(id int, count int, db *sql.DB) error {
 	query := fmt.Sprintf("UPDATE database SET VALUE = %d WHERE ID = %d", count, id)
 	_, err := db.Exec(query)
@@ -20,22 +26,7 @@ func changeCount(id int, count int, db *sql.DB) error {
 }
 
 func botCore(link string, dif int) {
-
-	//dialer, proxyErr := proxy.SOCKS5(
-	//	"tcp",
-	//	"62.112.11.204:80",
-	//	nil,
-	//	proxy.Direct,
-	//)
-	//if proxyErr != nil {
-	//	log.Panicf("Error in proxy %s", proxyErr)
-	//}
-	//
-	//client := &http.Client{Transport: &http.Transport{DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-	//	return dialer.Dial(network, addr)
-	//}}}
-	//bot, err := tgbotapi.NewBotAPIWithClient("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ", client)
-	bot, err := tgbotapi.NewBotAPI("944404078:AAG9Rk5JFkolvU4EwdSTXFqF2hnF3gLqBZQ")
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TOKEN"))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -50,21 +41,22 @@ func botCore(link string, dif int) {
 	bot.Send(msg)
 }
 
-func main() {
-	var (
-		id    int
-		title string //Full name
-		link  string //Link to page for scraping
-		value int    //Number of chapters currently saved in database
-		count = 0    //Number of found chapters
-	)
-
-	//Open database
+func dbOpen() (db *sql.DB) {
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	return db
+}
+func main() {
+	var (
+		count = 0    //Number of found chapters
+		db *sql.DB
+		data = Data{}
+	)
+
+	//Open database
+	db = dbOpen()
 
 	// Instantiate default collector
 	c := colly.NewCollector(
@@ -80,19 +72,19 @@ func main() {
 
 	res, _ := db.Query("select * from database")
 	for res.Next() {
-		err := res.Scan(&id, &title, &link, &value)
+		err := res.Scan(&data.id, &data.title, &data.link, &data.value)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, title, link, value)
-		c.Visit(link)
-		if count > value {
+		log.Println(data.id, data.title, data.link, data.value)
+		c.Visit(data.link)
+		if count > data.value {
 			// Send notification when new chapters are available
-			botCore(link, count-value)
+			botCore(data.link, count - data.value)
 			//Change chapter count inside the db
-			changeCount(id, count, db)
+			changeCount(data.id, count, db)
 		}
 		count = 0
 	}
-
+	db.Close()
 }
